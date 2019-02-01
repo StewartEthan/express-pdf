@@ -13,14 +13,15 @@ function internalError(res){
     res.sendStatus(500);
     res.end();
 }
-function setHeader(res, filename){
-    res.header('Content-Type', 'application/pdf');
+function setHeader(res, filename, forceDownload = false){
+    const contentType = forceDownload ? 'application/force-download' : 'application/pdf';
+    res.header('Content-Type', contentType);
     res.header('Content-Disposition', 'inline; filename="' + filename + '"');
     res.header('Content-Transfer-Encoding', 'binary');
 }
 function sendHTMLPDF(res, filename, content, options){
     return new Promise(function(resolve, reject){
-        setHeader(res, filename);
+        setHeader(res, filename, options.forceDownload || false);
         pdf.create(content, options).toStream(function(err, stream){
             if(err){
                 reject(err);
